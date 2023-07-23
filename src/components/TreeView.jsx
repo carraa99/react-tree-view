@@ -17,27 +17,37 @@ export function TreeItem({ title, children }) {
   };
 
     return (
-      
-    <div
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className=""
-    >
-      <div className="list-item hover:bg-gray-100 " onClick={() => setIsOpen(!isOpen)}>
-        <div>
-          {children ? isOpen ? <PiCaretDownBold /> : <PiCaretRightBold /> : ""}
-        </div>
-        <div>{title}</div>
-        {isHovered && (
-          <div className="flex text-gray-700 ml-[10vw]">
-            <MdDelete className="delete-icon" />
-            <AiTwotoneEdit className="edit-icon" />
+      <div
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className=""
+      >
+        <div
+          className="list-item hover:bg-gray-100 "
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div>
+            {children ? (
+              isOpen ? (
+                <PiCaretDownBold className="mr-1 mt-1" />
+              ) : (
+                <PiCaretRightBold className="mr-1 mt-1" />
+              )
+            ) : (
+              ""
+            )}
           </div>
-        )}
+          <div>{title}</div>
+          {isHovered && (
+            <div className="flex text-gray-700 ml-[10vw]">
+              <MdDelete className="delete-icon" />
+              <AiTwotoneEdit className="edit-icon" />
+            </div>
+          )}
+        </div>
+        {isOpen && <div className="list-item-subtree">{children}</div>}
       </div>
-      {isOpen && <div className="list-item-subtree">{children}</div>}
-    </div>
-  );
+    );
 }
 
 export function TreeView({ children }) {
