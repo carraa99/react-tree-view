@@ -4,8 +4,16 @@ import { PiCaretRightBold, PiCaretDownBold } from "react-icons/pi";
 import { MdDelete } from "react-icons/md";
 import { AiTwotoneEdit } from "react-icons/ai";
 import axios from "axios";
-
+import { enabled, disabled } from "../features/dialog/positionSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { setSelectedPositionId } from "../features/position/positionSlice";
 export function TreeItem({ title, children, id, onDeletePosition }) {
+  // const editDialog = useSelector((state) => state.dialog.showEditDialog);
+  const dispatch = useDispatch();
+    const handleClickOpen = () => {
+    dispatch(setSelectedPositionId(id));
+    dispatch(enabled());
+  };
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -55,8 +63,13 @@ export function TreeItem({ title, children, id, onDeletePosition }) {
             <MdDelete
               className="delete-icon cursor-pointer mr-5"
               onClick={handleDelete}
+              title="Delete"
             />
-            <AiTwotoneEdit className="edit-icon cursor-pointer" />
+            <AiTwotoneEdit
+              className="edit-icon cursor-pointer"
+              onClick={handleClickOpen}
+              title="Edit"
+            />
           </div>
         )}
       </div>

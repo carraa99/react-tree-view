@@ -1,69 +1,12 @@
 import { TreeView, TreeItem } from "./components/TreeView";
 import "./App.css";
 import Position from "./components/Position";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { enabled, disabled } from "./features/dialog/positionSlice";
+import { useSelector, useDispatch } from "react-redux";
+import EditDialog from "./components/EditDialog";
 
-const data = [
-  {
-    id: 1,
-    name: "Name 1",
-    subtrees: [
-      {
-        id: 11,
-        name: "Name 11",
-        subtrees: [],
-      },
-      {
-        id: 12,
-        name: "Name 12",
-        subtrees: [
-          {
-            id: 121,
-            name: "Name 12111",
-            subtrees: [],
-          },
-          {
-            id: 122,
-            name: "Name 122",
-            subtrees: [],
-          },
-          {
-            id: 123,
-            name: "Name 123",
-            subtrees: [],
-          },
-        ],
-      },
-      {
-        id: 13,
-        name: "Name 13",
-        subtrees: [],
-      },
-      {
-        id: 14,
-        name: "Name 14",
-        subtrees: [],
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Name 2",
-    subtrees: [
-      {
-        id: 22,
-        name: "Name 22",
-        subtrees: [],
-      },
-    ],
-  },
-  {
-    id: 3,
-    name: "Name 3",
-    subtrees: [],
-  },
-];
 const organizePositionsIntoTree = (positions) => {
   const trees = [];
 
@@ -95,17 +38,22 @@ export default function App() {
   const [positionsDeleted, setPositionsDeleted] = useState([]);
   const [newPositions, setNewPositions] = useState([]);
 
+  const editDialog = useSelector((state) => state.dialog.showEditDialog);
+  const dispatch = useDispatch();
+  const handleClose = () => {
+    dispatch(disabled());
+  };
 
-    useEffect(() => {
-      axios
-        .get("http://localhost:5000/positions")
-        .then((response) => {
-          const organizedTree = organizePositionsIntoTree(response.data);
-          setPositions(organizedTree);
-          setPositionTree(response.data);
-        })
-        .catch((error) => console.error("Error fetching data:", error));
-    }, []);
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/positions")
+      .then((response) => {
+        const organizedTree = organizePositionsIntoTree(response.data);
+        setPositions(organizedTree);
+        setPositionTree(response.data);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const renderSubtrees = (trees) => {
     return trees.map((tree) => {
@@ -141,7 +89,6 @@ export default function App() {
     });
   };
 
-
   const handleDeletePosition = (id) => {
     // Update the state by adding the deleted position ID to positionsDeleted
     setPositionsDeleted((prevPositionsDeleted) => [
@@ -150,20 +97,22 @@ export default function App() {
     ]);
   };
   const addNewPosition = (newPosition) => {
-     window.location.reload();
-     setNewPositions((prevNewPositions) => [
-       ...prevNewPositions,
-       newPosition.id,
-     ]);
-     setPositions((prevPositions) => [...prevPositions, newPosition]);
-     setPositionTree((prevTree) => [...prevTree, newPosition]);
-   };
+    window.location.reload();
+    setNewPositions((prevNewPositions) => [
+      ...prevNewPositions,
+      newPosition.id,
+    ]);
+    setPositions((prevPositions) => [...prevPositions, newPosition]);
+    setPositionTree((prevTree) => [...prevTree, newPosition]);
+  };
   return (
     <div className="App">
       <div className="mt-5 mb-16">
         <TreeView>{renderSubtrees(positions)}</TreeView>
       </div>
+
       <Position addNewPosition={addNewPosition} positions={positionTree} />
+      <EditDialog />
     </div>
   );
 }
