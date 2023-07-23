@@ -7,40 +7,16 @@
       "id": 1
     },
     {
-      "name": "Director",
-      "description": "no description",
-      "parentName": "NONE",
-      "id": 2
-    },
-    {
       "name": "Principal",
       "description": "no description",
       "parentName": "CEO",
       "id": 3
     },
     {
-      "name": "Quality Assurer",
-      "description": "no description",
-      "parentName": "CEO",
-      "id": 4
-    },
-    {
-      "name": "Chera Weltaji",
-      "description": "no description",
+      "name": "Developer",
+      "description": "aaa",
       "parentName": "Director",
       "id": 5
-    },
-    {
-      "name": "sss",
-      "description": "sss",
-      "parentName": "Quality Assurer",
-      "id": 6
-    },
-    {
-      "name": "gamme",
-      "description": "This is manager",
-      "parentName": "Director",
-      "id": 7
     }
   ]
 }
