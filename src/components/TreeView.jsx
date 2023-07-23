@@ -25,16 +25,35 @@ export function TreeItem({ title, children, id, onDeletePosition }) {
     setIsHovered(false);
   };
 
-  const handleDelete = () => {
-    // Make a DELETE request to the JSON server to delete the position by its ID
-    axios
-      .delete(`http://localhost:5000/positions/${id}`)
-      .then((response) => {
-        console.log("Position deleted successfully:", response.data);
-        onDeletePosition(id); // Notify the parent component that the position is deleted
-      })
-      .catch((error) => console.error("Error deleting position:", error));
+  const deletePositionAndChildren = async (positionId) => {
+    // Fetch the position data to check if it has children (subtrees)
+    const response = await axios.get(
+      `http://localhost:5000/positions/${positionId}`
+    );
+    const position = response.data;
+
+    // If the position has subtrees, recursively delete all the children positions
+    if (position.subtrees && position.subtrees.length > 0) {
+      for (const childId of position.subtrees) {
+        await deletePositionAndChildren(childId);
+      }
+    }
+
+    // Finally, delete the current position
+    await axios.delete(`http://localhost:5000/positions/${positionId}`);
   };
+
+  const handleDelete = async () => {
+    // Use the recursive function to delete the current position and its children
+    try {
+      await deletePositionAndChildren(id);
+      console.log("Position and its children deleted successfully");
+      onDeletePosition(id); // Notify the parent component that the position is deleted
+    } catch (error) {
+      console.error("Error deleting position:", error);
+    }
+  };
+
 
   return (
     <div

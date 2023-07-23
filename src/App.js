@@ -8,29 +8,41 @@ import { useSelector, useDispatch } from "react-redux";
 import EditDialog from "./components/EditDialog";
 
 const organizePositionsIntoTree = (positions) => {
-  const trees = [];
+  const parentNamesWithChildren = new Set();
 
   // Map to quickly find positions by their name
   const positionMap = new Map();
-  positions.forEach((position) => positionMap.set(position.name, position));
+  positions.forEach((position) => {
+    positionMap.set(position.name, position);
+    if (position.parentName !== "NONE") {
+      parentNamesWithChildren.add(position.parentName);
+    }
+  });
 
   // Build the trees
-  positions.forEach((position) => {
+  const trees = positions.filter((position) => {
     if (position.parentName === "NONE") {
-      // Standalone tree
-      trees.push(position);
-    } else if (positionMap.has(position.parentName)) {
-      // Subtree
+      return true; // Standalone tree
+    } else {
       const parent = positionMap.get(position.parentName);
-      if (!parent.subtrees) {
-        parent.subtrees = [];
+      if (parent && parentNamesWithChildren.has(parent.name)) {
+        // Subtree
+        if (!parent.subtrees) {
+          parent.subtrees = [];
+        }
+        parent.subtrees.push(position);
+        return false;
+      } else {
+        return true; // Standalone tree
       }
-      parent.subtrees.push(position);
     }
   });
 
   return trees;
 };
+
+
+
 
 export default function App() {
   const [positions, setPositions] = useState([]);
