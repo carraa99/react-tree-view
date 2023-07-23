@@ -7,16 +7,16 @@
       "id": 1
     },
     {
+      "name": "Director",
+      "description": "no description",
+      "parentName": "NONE",
+      "id": 2
+    },
+    {
       "name": "Principal",
       "description": "no description",
       "parentName": "CEO",
       "id": 3
-    },
-    {
-      "name": "Developer",
-      "description": "aaa",
-      "parentName": "Director",
-      "id": 5
     }
   ]
 }
