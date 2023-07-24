@@ -14,9 +14,15 @@
     },
     {
       "name": "Principal",
+      "description": "This is manager",
+      "parentName": "Director",
+      "id": 7
+    },
+    {
+      "name": "Developer",
       "description": "no description",
       "parentName": "Manager",
-      "id": 7
+      "id": 8
     }
   ]
 }

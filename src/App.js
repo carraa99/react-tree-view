@@ -7,7 +7,37 @@ import { enabled, disabled } from "./features/dialog/positionSlice";
 import { useSelector, useDispatch } from "react-redux";
 import EditDialog from "./components/EditDialog";
 
-const organizePositionsIntoTree = (positions) => {
+
+
+
+export default function App() {
+   let selectedPositionId = useSelector(
+     (state) => state.position.selectedPositionId
+   );
+  const [positions, setPositions] = useState([]);
+  const [positionTree, setPositionTree] = useState([]);
+  const [positionsDeleted, setPositionsDeleted] = useState([]);
+  const [newPositions, setNewPositions] = useState([]);
+ const [positionChanged, setPositionChanged] = useState(false)
+  const editDialog = useSelector((state) => state.dialog.showEditDialog);
+  const dispatch = useDispatch();
+  const handleClose = () => {
+    dispatch(disabled());
+  };
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/positions")
+      .then((response) => {
+        const organizedTree = organizePositionsIntoTree(response.data);
+        setPositions(organizedTree);
+        setPositionTree(response.data);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, [positionChanged, selectedPositionId]);
+
+ 
+  const organizePositionsIntoTree = (positions) => {
   const parentNamesWithChildren = new Set();
 
   // Map to quickly find positions by their name
@@ -40,33 +70,6 @@ const organizePositionsIntoTree = (positions) => {
 
   return trees;
 };
-
-
-
-
-export default function App() {
-  const [positions, setPositions] = useState([]);
-  const [positionTree, setPositionTree] = useState([]);
-  const [positionsDeleted, setPositionsDeleted] = useState([]);
-  const [newPositions, setNewPositions] = useState([]);
-
-  const editDialog = useSelector((state) => state.dialog.showEditDialog);
-  const dispatch = useDispatch();
-  const handleClose = () => {
-    dispatch(disabled());
-  };
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/positions")
-      .then((response) => {
-        const organizedTree = organizePositionsIntoTree(response.data);
-        setPositions(organizedTree);
-        setPositionTree(response.data);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
   const renderSubtrees = (trees) => {
     return trees.map((tree) => {
       if (!tree.subtrees || tree.subtrees.length === 0) {
@@ -109,22 +112,20 @@ export default function App() {
     ]);
   };
   const addNewPosition = (newPosition) => {
-    window.location.reload();
-    setNewPositions((prevNewPositions) => [
-      ...prevNewPositions,
-      newPosition.id,
-    ]);
-    setPositions((prevPositions) => [...prevPositions, newPosition]);
-    setPositionTree((prevTree) => [...prevTree, newPosition]);
+    setPositions([...positions, newPosition]);
   };
   return (
     <div className="App">
       <div className="mt-5 mb-16">
-        <TreeView>{renderSubtrees(positions)}</TreeView>
+        <TreeView setPositionChanged={setPositionChanged}>{renderSubtrees(positions)}</TreeView>
       </div>
 
-      <Position addNewPosition={addNewPosition} positions={positionTree} />
-      <EditDialog />
+      <Position
+        addNewPosition={addNewPosition}
+        positions={positionTree}
+        setPositionChanged={setPositionChanged}
+      />
+      <EditDialog setPositionChanged={setPositionChanged} />
     </div>
   );
 }

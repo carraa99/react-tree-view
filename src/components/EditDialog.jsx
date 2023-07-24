@@ -6,66 +6,81 @@ import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 
-const EditDialog = () => {
+const EditDialog = ({setPositionChanged}) => {
   let selectedPositionId = useSelector(
     (state) => state.position.selectedPositionId
-    );
-    console.log("seled id from modal", selectedPositionId)
+  );
+  console.log("seled id from modal", selectedPositionId);
   console.log("the selected position is ", selectedPositionId);
   const editDialog = useSelector((state) => state.dialog.showEditDialog);
   const { register, handleSubmit, reset, formState } = useForm();
   const [positions, setPositions] = useState([]);
   const [selectedPositionName, setSelectedPositionName] = useState("");
-  const [selectedPositionDescription, setSelectedPositionDescription] = useState("");
+  const [selectedPositionDescription, setSelectedPositionDescription] =
+    useState("");
   const [selectedPositionParent, setSelectedPositionParent] = useState("");
 
   const dispatch = useDispatch();
-    const handleClose = () => {
-        selectedPositionId = null;
+  const handleClose = () => {
+    selectedPositionId = null;
     dispatch(disabled());
-    };
-     const parentOptions = positions.filter(
-       (position) => position.name !== selectedPositionName
-     );
+  };
+  const parentOptions = positions.filter(
+    (position) => position.name !== selectedPositionName
+  );
   useEffect(() => {
     // Fetch data from the JSON server using Axios
     axios
       .get("http://localhost:5000/positions")
       .then((response) => setPositions(response.data))
       .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  }, [selectedPositionId]);
+
+  useEffect(() => {
+    // When the selected position changes, reset the form fields with the new data
+    reset({
+      name: selectedPositionName,
+      description: selectedPositionDescription,
+      parentName: selectedPositionParent,
+    });
+  }, [
+    selectedPositionName,
+    selectedPositionDescription,
+    selectedPositionParent,
+  ]);
 
   useEffect(() => {
     // Assuming you have access to the positionTree in the EditModal component
     const selectedPosition = positions.find(
       (position) => position.id === selectedPositionId
     );
-      if (selectedPosition) {
-        console.log("the selected position", selectedPosition);
-        setSelectedPositionName(selectedPosition.name);
-        setSelectedPositionDescription(selectedPosition.description);
-        setSelectedPositionParent(selectedPosition.parentName)
+    if (selectedPosition) {
+      console.log("the selected position", selectedPosition);
+      setSelectedPositionName(selectedPosition.name);
+      setSelectedPositionDescription(selectedPosition.description);
+      setSelectedPositionParent(selectedPosition.parentName);
     }
   }, [selectedPositionId, positions]);
-    const onSubmit = (data) => {
-      // Make a PUT request to the JSON server with the updated position data
-      axios
-        .put(`http://localhost:5000/positions/${selectedPositionId}`, data)
-        .then((response) => {
-          console.log("Position updated successfully:", response.data);
-          // Optionally, you can close the modal or perform any other action upon successful update
-          handleClose();
-        })
-        .catch((error) => console.error("Error updating position:", error));
-    };
-    
+
+  const onSubmit = (data) => {
+    // Make a PUT request to the JSON server with the updated position data
+    axios
+      .put(`http://localhost:5000/positions/${selectedPositionId}`, data)
+      .then((response) => {
+        console.log("Position updated successfully:", response.data);
+        setPositionChanged((prevPosition)=>!prevPosition)
+        // Optionally, you can close the modal or perform any other action upon successful update
+        handleClose();
+      })
+      .catch((error) => console.error("Error updating position:", error));
+  };
 
   return (
     <div>
       <Modal
         opened={editDialog}
         onClose={handleClose}
-        title="Simple Modal"
+        title="Edit Position"
         size="lg"
         overlayOpacity={0.6}
         withCloseButton
