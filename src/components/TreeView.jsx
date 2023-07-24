@@ -10,7 +10,7 @@ import { setSelectedPositionId } from "../features/position/positionSlice";
 export function TreeItem({ title, children, id, onDeletePosition }) {
   // const editDialog = useSelector((state) => state.dialog.showEditDialog);
   const dispatch = useDispatch();
-    const handleClickOpen = () => {
+  const handleClickOpen = () => {
     dispatch(setSelectedPositionId(id));
     dispatch(enabled());
   };
@@ -48,12 +48,13 @@ export function TreeItem({ title, children, id, onDeletePosition }) {
     try {
       await deletePositionAndChildren(id);
       console.log("Position and its children deleted successfully");
-      onDeletePosition(id); // Notify the parent component that the position is deleted
+      onDeletePosition(id);
+      // Notify the parent component that the position is deleted
+      children.setPositionChanged((prevPosition) => !prevPosition);
     } catch (error) {
       console.error("Error deleting position:", error);
     }
   };
-
 
   return (
     <div

@@ -2,17 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 
-const Position = ({ addNewPosition }) => {
-  const [positions, setPositions] = useState([]);
+const Position = ({ addNewPosition, setPositionChanged, positions }) => {
+  // const [positions, setPositions] = useState([]);
   const [positionCreated, setPositionCreated] = useState(false);
 
-  useEffect(() => {
-    // Fetch data from the JSON server using Axios
-    axios
-      .get("http://localhost:5000/positions")
-      .then((response) => setPositions(response.data))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+  // useEffect(() => {
+  //   // Fetch data from the JSON server using Axios
+  //   axios
+  //     .get("http://localhost:5000/positions")
+  //     .then((response) => setPositions(response.data))
+  //     .catch((error) => console.error("Error fetching data:", error));
+  // }, []);
 
   const { register, handleSubmit, reset, formState } = useForm();
     useEffect(() => {
@@ -27,6 +27,7 @@ const Position = ({ addNewPosition }) => {
       .then((response) => {
         addNewPosition(response.data);
         console.log("Position added successfully:", response.data);
+        setPositionChanged((prevPosition) => !prevPosition);
         // Clear the form after successful submission
         reset();
       })
