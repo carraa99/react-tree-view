@@ -7,7 +7,7 @@ import axios from "axios";
 import { enabled, disabled } from "../features/dialog/positionSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedPositionId } from "../features/position/positionSlice";
-export function TreeItem({ title, children, id, onDeletePosition }) {
+export function TreeItem({ title, children, id, onDeletePosition, setPositions }) {
   // const editDialog = useSelector((state) => state.dialog.showEditDialog);
   const dispatch = useDispatch();
   const handleClickOpen = () => {
@@ -38,7 +38,9 @@ export function TreeItem({ title, children, id, onDeletePosition }) {
         await deletePositionAndChildren(childId);
       }
     }
-
+setPositions((prevPositions) =>
+  prevPositions.filter((pos) => pos.id !== positionId)
+);
     // Finally, delete the current position
     await axios.delete(`http://localhost:5000/positions/${positionId}`);
   };

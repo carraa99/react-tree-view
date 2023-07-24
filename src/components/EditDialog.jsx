@@ -5,6 +5,7 @@ import { enabled, disabled } from "../features/dialog/positionSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { Alert } from "@mantine/core";
 
 const EditDialog = ({setPositionChanged}) => {
   let selectedPositionId = useSelector(
@@ -15,6 +16,8 @@ const EditDialog = ({setPositionChanged}) => {
   const editDialog = useSelector((state) => state.dialog.showEditDialog);
   const { register, handleSubmit, reset, formState } = useForm();
   const [positions, setPositions] = useState([]);
+  const [positionUpdated, setPositionUpdated] = useState(false)
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [selectedPositionName, setSelectedPositionName] = useState("");
   const [selectedPositionDescription, setSelectedPositionDescription] =
     useState("");
@@ -23,7 +26,9 @@ const EditDialog = ({setPositionChanged}) => {
   const dispatch = useDispatch();
   const handleClose = () => {
     selectedPositionId = null;
-    dispatch(disabled());
+      dispatch(disabled());   
+    
+    
   };
   const parentOptions = positions.filter(
     (position) => position.name !== selectedPositionName
@@ -68,12 +73,26 @@ const EditDialog = ({setPositionChanged}) => {
       .put(`http://localhost:5000/positions/${selectedPositionId}`, data)
       .then((response) => {
         console.log("Position updated successfully:", response.data);
-        setPositionChanged((prevPosition)=>!prevPosition)
+        setPositionChanged((prevPosition) => !prevPosition)
+        setShowSuccessAlert(true);
         // Optionally, you can close the modal or perform any other action upon successful update
-        handleClose();
+        const timer = setTimeout(() => {
+          handleClose();
+          setShowSuccessAlert(false)
+       },2000) 
       })
       .catch((error) => console.error("Error updating position:", error));
   };
+   useEffect(() => {
+     if (positionUpdated) {
+       const timer = setTimeout(() => {
+         setPositionUpdated(false);
+       }, 2000); // Adjust the duration to 2000ms (2 seconds)
+
+       return () => clearTimeout(timer);
+     }
+   }, [positionUpdated]);
+
 
   return (
     <div>
@@ -86,6 +105,13 @@ const EditDialog = ({setPositionChanged}) => {
         withCloseButton
         style={{ width: "60vw" }}
       >
+        {showSuccessAlert && (
+          <div className="flex justify-center items-center">
+            <Alert title="Success!" color="green" className="w-[20vw] ">
+              Position Updated successfully!
+            </Alert>
+          </div>
+        )}
         <div style={{ padding: "16px" }}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 ">
             <input

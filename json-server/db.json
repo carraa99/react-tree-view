@@ -20,7 +20,7 @@
     },
     {
       "name": "Developer",
-      "description": "no description",
+      "description": "developer",
       "parentName": "Manager",
       "id": 8
     }
