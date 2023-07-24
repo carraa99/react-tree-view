@@ -79,6 +79,7 @@ export default function App() {
             id={tree.id}
             title={tree.name}
             onDeletePosition={handleDeletePosition}
+            setPositions={setPositions}
           />
         );
       }
